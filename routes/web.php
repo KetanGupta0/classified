@@ -51,3 +51,4 @@ Route::post('admin/load-chats',[AdminController::class,'loadChatsAJAX']);
 Route::post('admin/send-chats',[AdminController::class,'sendChatsAJAX']);
 Route::post('admin/open-chat-message',[AdminController::class,'openChatMessageAJAX']);
 Route::post('admin/load-new-chats-count',[AdminController::class,'loadNewChatsCountAJAX']);
+Route::post('admin/send-reply-from-admin',[AdminController::class,'sendReplyFromAdminAJAX']);

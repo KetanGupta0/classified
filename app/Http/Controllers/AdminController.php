@@ -516,28 +516,35 @@ class AdminController extends Controller
     }
 
     public function loadChatsAJAX(){        // Under development
-        $chats = AdminChat::get();
-        $chatMsg = array();
+        $chats = AdminChat::where('seen_flag','=',0)->get();
+        $userids = array();
         foreach($chats as $chat){
-            if($chat->msg_from == 0){
-                if($chat->seen_flag==0){
-                    array_push($chatMsg,['sender' => 'admin', 'message' => $chat->message]);
-                }
-                else{
-                    array_push($chatMsg,['sender' => 'admin', 'message' => $chat->message]);
-                }
-            }
-            else{
-                $user = Userlist::where('user_id','=',$chat->msg_from)->first();
-                if($chat->seen_flag==0){
-                    array_push($chatMsg,['sender' => 'user', 'chatid' => $chat->chat_id, 'message' => $chat->message, 'status' => 'unseen', 'username' => $user->user_name, 'userid' => $user->user_id]);
-                }
-                else{
-                    array_push($chatMsg,['sender' => 'user', 'chatid' => $chat->chat_id,'message' => $chat->message, 'status' => 'seen', 'username' => $user->user_name, 'userid' => $user->user_id]);
-                }
-            }
+            array_push($userids,$chat->msg_from);
         }
-        return response()->json($chatMsg);
+        $unique = array_unique($userids);   // To remove duplicate results
+        $unique = array_values($unique);    // For re-indexing of resulting array
+
+        $data = array();
+        foreach($unique as $uni){
+            $total = 0;
+            if($uni==0){
+                continue;
+            }
+            $user = Userlist::find($uni);
+            $msgs = AdminChat::where('msg_from','=',$uni)->get();
+            foreach($msgs as $msg){
+                if($msg->seen_flag == 0){
+                    $total++;
+                }
+            }
+            array_push($data,[
+                'username' => $user->user_name,
+                'msg_count' => $total,
+                'user_id' => $user->user_id,
+            ]);
+        }
+        
+        return response()->json($data);
     }
 
     public function sendChatsAJAX(Request $request){        // Under development
@@ -558,19 +565,37 @@ class AdminController extends Controller
     }
 
     public function openChatMessageAJAX(Request $request){
-        $chatid = $request->chat_id;
-        $flagchange = AdminChat::find($chatid);
-        $flagchange->seen_flag=1;
-        $flagchange->update();
-
-        $chat = AdminChat::find($chatid);
-        $name = Userlist::find($chat->msg_from);
-        $chats = [
-            'username' => $name->user_name,
-            'message' => $chat->message,
-            'chatid' => $chatid,
-        ];
-        return response()->json($chats);
+        $uid = $request->uid;
+        $flagchanges = AdminChat::where('msg_from','=',$uid)->where('seen_flag','=', 0)->get();
+        foreach($flagchanges as $change){
+            $change->seen_flag = 1;
+            $change->update();
+        }
+        $data = array();
+        $Chats = AdminChat::where('msg_from','=',$uid)->orWhere('msg_to','=', $uid)->get();
+        foreach($Chats as $chat){
+            
+            if($chat->msg_to == $uid){
+                array_push($data, [
+                    'sender' => 'admin',
+                    'message' => $chat->message,
+                    'send_time' => $chat->created_at,
+                    'seen_time' => $chat->updated_at,
+                    'uid' => $uid,
+                ]);
+            }
+            else{
+                $name = Userlist::find($uid);
+                array_push($data, [
+                    'sender' => $name->user_name,
+                    'message' => $chat->message,
+                    'send_time' => $chat->created_at,
+                    'seen_time' => $chat->updated_at,
+                    'uid' => $uid,
+                ]);
+            }
+        }
+        return response()->json($data);
     }
 
     public function loadNewChatsCountAJAX(){
@@ -584,5 +609,22 @@ class AdminController extends Controller
             }
         }
         return response()->json($counter);
+    }
+
+    public function sendReplyFromAdminAJAX(Request $request){
+        $uid = $request->uid;
+        $msg = $request->msg;
+
+        $reply = new AdminChat();
+        $reply->msg_to = $uid;
+        $reply->msg_from = 0;
+        $reply->message = $msg;
+        $result = $reply->save();
+        if($result){
+            return response()->json('success');
+        }
+        else{
+            return response()->json("fail");
+        }
     }
 }

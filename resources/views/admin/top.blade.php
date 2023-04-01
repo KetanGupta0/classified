@@ -300,7 +300,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
-            <div class="container w-100" id='viewChat'>
+            <div class="container w-100 position-relative" id='viewChat'>
 
             </div>
         </div>
@@ -314,11 +314,14 @@
             }
         });
         $(document).ready(function() {
+            let totalMsgs = 0;
+
             function loadChat() {
                 $.ajax({
                     url: "{{ url('admin/load-new-chats-count') }}",
                     type: "POST",
                     success: function(res) {
+                        totalMsgs = res;
                         $('#new-msg-notification').html(res);
                     }
                 });
@@ -334,70 +337,152 @@
                     type: "POST",
                     success: function(res) {
                         console.log(res);
-                        let unseen = 0;
-
-                        console.log(unique);
+                        let count = 0;
                         $.each(res, function(key, value) {
-                            if (value.sender == 'user') {
-                                if (value.status == 'unseen') {
-                                    unseen++;
-                                    $('#chat-msg').append(`
-                                        <li class="message-item unseen-msg" msg-from='${value.userid}' chatid='${value.chatid}'>
-                                                <a type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
-                                                    <div class="position-relative">
-                                                        <span class="badge bg-success badge-number" id="new-msg-notification">5</span>
-                                                        <h4>${value.username}</h4>
-                                                        <p>${value.message}</p>
-                                                        <p>4 hrs. ago</p>
-                                                    </div>
-                                                </a>
-                                        </li>
-                                        <li>
-                                            <hr class="dropdown-divider">
-                                        </li>
-                                    `);
-                                }
-                            }
+                            count++;
+                            $('#chat-msg').append(`
+                                <li class="message-item unseen-msg" msg-from='${value.user_id}'>
+                                        <a type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                                            <div class="position-relative w-100">
+                                                <div class="" style="right: 0;">
+                                                    <span class="badge bg-success badge-number" id="new-msg-notification">${value.msg_count}</span>
+                                                </div>
+                                                <h4>${value.username}</h4>
+                                            </div>
+                                        </a>
+                                </li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                            `);
                         });
-                        if (unseen <= 1) {
+                        if (totalMsgs <= 1) {
                             $('#new-msg').html(`
-                                You have ${unseen} new message
-                                <a class="badge rounded-pill bg-primary p-2 ms-2 text-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">View all</a>
+                                You have ${totalMsgs} new message from ${count} chat
+                                <a href="#" class="badge rounded-pill bg-primary p-2 ms-2 text-light">View all</a>
                             `);
                         } else {
                             $('#new-msg').html(`
-                                You have ${unseen} unseen messages
-                                <a class="badge rounded-pill bg-primary p-2 ms-2 text-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">View all</a>
+                                You have ${totalMsgs} new messages from ${count} chats
+                                <a href="#" class="badge rounded-pill bg-primary p-2 ms-2 text-light">View all</a>
                             `);
                         }
                     }
                 });
             });
-
+            let uid = 0;
             $(document).on('click', '.unseen-msg', function() {
                 let msgFrom = $(this).attr('msg-from');
-                let chatId = $(this).attr('chatid');
                 $.ajax({
                     url: "{{ url('admin/open-chat-message') }}",
                     type: "POST",
                     data: {
-                        msg_from: msgFrom,
-                        chat_id: chatId,
+                        uid: msgFrom,
                     },
                     success: function(res) {
-                        $('#viewChat').html(`
-                            <div class="container">
-                                <h1>${res.username}</h1>
-                                <p>${res.message}</p>
-                            </div>
-                        `);
+                        
                         console.log(res);
+                        $('#viewChat').html(``);
+                        $.each(res, function(key, value) {
+                            if (value.sender != 'admin') {
+                                uid = value.uid;
+                                $('#viewChat').append(`
+                                <div class="media mb-3 float-start">
+                                    <div class="media-body bg-info text-dark rounded p-4" style="width: 15rem;">
+                                        <h5 class="mt-0">${value.sender}</h5>
+                                        ${value.message}
+                                    </div>
+                                </div>
+                                `);
+                            } else {
+                                $('#viewChat').append(`
+                                <div class="media mb-3 float-end">
+                                    <div class="media-body bg-info text-dark rounded p-4" style="width: 15rem;">
+                                        <h5 class="mt-0">You</h5>
+                                        ${value.message}
+                                    </div>
+                                </div>
+                                `);
+                            }
+                        });
+                        $('#viewChat').append(`
+                            <form id="sendReplyFromAdmin" user="${uid}">
+                                <div class="input-group mb-3" style="position: sticky; bottom: 0; width: 20rem;">
+                                    <input type="text" name="msg" class="form-control msg" placeholder="Type your message here" aria-label="Type your message here" aria-describedby="button-send">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary msg-btn" type="button" id="button-send">Send</button>
+                                    </div>
+                                </div>
+                            </form>
+                        `);
                     }
+                });
+            });
+            $(document).on('click', '.msg-btn', function() {
+                let uid = $('#sendReplyFromAdmin').attr('user');
+                let msg = $('.msg').val();
+                $.ajax({
+                    type: "POST",
+                    url: "{{ url('admin/send-reply-from-admin') }}",
+                    data: {
+                        uid: uid,
+                        msg: msg,
+                    },
+                    success: function(res) {
+                        if (res == 'success') {
+                            let msgFrom = uid;
+                            $.ajax({
+                                url: "{{ url('admin/open-chat-message') }}",
+                                type: "POST",
+                                data: {
+                                    uid: msgFrom,
+                                },
+                                success: function(res) {
+                                    console.log(res);
+                                    $('#viewChat').html(``);
+                                    $.each(res, function(key, value) {
+                                        if (value.sender != 'admin') {
+                                            uid = value.uid;
+                                            $('#viewChat').append(`
+                                            <div class="media mb-3 float-start">
+                                                <div class="media-body bg-info text-dark rounded p-4" style="width: 15rem;">
+                                                    <h5 class="mt-0">${value.sender}</h5>
+                                                    ${value.message}
+                                                </div>
+                                            </div>
+                                            `);
+                                        } else {
+                                            $('#viewChat').append(`
+                                            <div class="media mb-3 float-end">
+                                                <div class="media-body bg-info text-dark rounded p-4" style="width: 15rem;">
+                                                    <h5 class="mt-0">You</h5>
+                                                    ${value.message}
+                                                </div>
+                                            </div>
+                                            `);
+                                        }
+                                    });
+                                    $('#viewChat').append(`
+                                        <form id="sendReplyFromAdmin" user="${uid}">
+                                            <div class="input-group mb-3" style="position: sticky; bottom: 0; width: 20rem;">
+                                                <input type="text" name="msg" class="form-control msg" placeholder="Type your message here" aria-label="Type your message here" aria-describedby="button-send">
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-primary msg-btn" type="button" id="button-send">Send</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    `);
+                                }
+                            });
+                        } else {
+                            console.log('Error Found');
+                        }
+                    },
                 });
             });
 
             setInterval(() => {
                 loadChat();
-            }, 1000);
+            }, 3000);
         });
     </script>
