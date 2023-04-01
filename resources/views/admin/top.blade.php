@@ -216,7 +216,7 @@
                     <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
                         <li>
                             <a href="tables-general.html">
-                                <i class="bi bi-circle"></i><span>Plans</span>
+                                <i class="bi bi-circle"></i><span>Plan</span>
                             </a>
                         </li>
                         <li>
