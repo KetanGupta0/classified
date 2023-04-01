@@ -129,7 +129,7 @@
         <ul class="sidebar-nav" id="sidebar-nav">
 
             <li class="nav-heading">
-                Apps
+                Management
             </li>
 
             <li class="nav-item">
@@ -153,11 +153,6 @@
                     <i class="bi bi-list"></i>
                     <span>Form Fields</span>
                 </a>
-            </li>
-
-
-            <li class="nav-heading">
-                Management
             </li>
 
 
@@ -215,23 +210,21 @@
                     </a>
                     <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
                         <li>
-                            <a href="tables-general.html">
-                                <i class="bi bi-circle"></i><span>Plans</span>
+                            
+                        </li>
+                        <li>
+                            <a href="tables-data.html">
+                                <i class="bi bi-circle"></i><span>Transactions</span>
                             </a>
                         </li>
                         <li>
                             <a href="tables-data.html">
-                                <i class="bi bi-circle"></i><span>Custom Settings</span>
+                                <i class="bi bi-circle"></i><span>Redeem Request</span>
                             </a>
                         </li>
                         <li>
                             <a href="tables-data.html">
-                                <i class="bi bi-circle"></i><span>Upgrade</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="tables-data.html">
-                                <i class="bi bi-circle"></i><span>Cron Logs</span>
+                                <i class="bi bi-circle"></i><span>Redeem History</span>
                             </a>
                         </li>
                     </ul>
@@ -240,7 +233,7 @@
                 <li class="nav-item">
                     <a class="nav-link collapsed" href="users-profile.html">
                         <i class="bi bi-person"></i>
-                        <span>Taxes</span>
+                        <span>Settings</span>
                     </a>
                 </li><!-- End Profile Page Nav -->
 
@@ -380,7 +373,7 @@
                         uid: msgFrom,
                     },
                     success: function(res) {
-                        
+
                         console.log(res);
                         $('#viewChat').html(``);
                         $.each(res, function(key, value) {
