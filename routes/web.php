@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
+
+// View Routes
 Route::get('/',[AdminController::class,'loginView']);
 Route::get('/admin',[AdminController::class,'loginView']);
 Route::get('admin/dashboard',[AdminController::class,'dashboardView']);
@@ -14,7 +16,10 @@ Route::get('admin/expired-ads',[AdminController::class,'expiredAdsView']);
 Route::get('admin/all-ads',[AdminController::class,'allAdsView']);
 Route::get('admin/resubmitted-ads',[AdminController::class,'resubmitedAdsView']);
 Route::get('admin/hidden-ads',[AdminController::class,'hiddenAdsView']);
+Route::get('admin/add-creators',[AdminController::class,'addCreatorsView']);
+Route::get('admin/add-viewers',[AdminController::class,'addViewersView']);
 
+// Fetch Routes
 Route::post('admin/check-login',[AdminController::class,'validateLogin']);
 Route::post('admin/save-category',[AdminController::class,'saveCategoryAJAX']);
 Route::post('admin/update-category',[AdminController::class,'updateCategoryAJAX']);
@@ -25,6 +30,15 @@ Route::post('admin/deleteCategoryData',[AdminController::class,'deleteCategoryDa
 Route::post('admin/categoryData',[AdminController::class,'categoryDataAJAX']);
 Route::post('admin/fetchForm',[AdminController::class,'fetchFormAJAX']);
 Route::post('admin/fetchOptions',[AdminController::class,'fetchOptionsAJAX']);
+
+Route::post('admin/fetch-creators-list',[AdminController::class,'fetchCreatorsListAJAX']);
+Route::post('admin/fetch-viewers-list',[AdminController::class,'fetchViewersListAJAX']);
+Route::post('admin/fetch-reffered-by',[AdminController::class,'fetchRefferedByAJAX']);
+Route::post('admin/block-user',[AdminController::class,'blockUserAJAX']);
+Route::post('admin/unblock-user',[AdminController::class,'unblockUserAJAX']);
+Route::post('admin/load-admin-user-chat',[AdminController::class,'loadAdminUserChatAJAX']);
+Route::post('admin/fetch-user-reffereal-list',[AdminController::class,'fetchUserRefferealListAJAX']);
+Route::post('admin/fetch-points-history',[AdminController::class,'fetchPointsHistoryAJAX']);
 
 Route::post('admin/save-form-structure',[AdminController::class,'saveFormStructureAJAX']);
 

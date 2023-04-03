@@ -17,6 +17,7 @@ use App\Models\Adds;
 use App\Models\FormSelect;
 use App\Models\Userlist;
 use App\Models\AdminChat;
+use App\Models\PointsHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
@@ -114,12 +115,32 @@ class AdminController extends Controller
         } else return redirect('/admin');
     }
 
-     // Hidden Ads view
+    // Hidden Ads view
     public function hiddenAdsView()
     {
         if (session::has('adminloginid')) {
             echo view('admin.top');
             echo view('admin.hiddenByUser');
+            echo view('admin.bottom');
+        } else return redirect('/admin');
+    }
+
+    // Add Creators View
+    public function addCreatorsView()
+    {
+        if (session::has('adminloginid')) {
+            echo view('admin.top');
+            echo view('admin.addcreators');
+            echo view('admin.bottom');
+        } else return redirect('/admin');
+    }
+
+    // Add Viewers View
+    public function addViewersView()
+    {
+        if (session::has('adminloginid')) {
+            echo view('admin.top');
+            echo view('admin.addviewers');
             echo view('admin.bottom');
         } else return redirect('/admin');
     }
@@ -625,6 +646,202 @@ class AdminController extends Controller
         }
         else{
             return response()->json("fail");
+        }
+    }
+
+    public function fetchCreatorsListAJAX(){
+        $users = Userlist::get();
+        $userids = [];
+        foreach($users as $user){
+            array_push($userids, $user->user_id);
+        }
+        $creators = [];
+        foreach($userids as $id){
+            $check = Adds::where('user_id','=',$id)->first();
+            if($check){
+                $user = Userlist::find($id);
+                if($user->reference!=null){
+                    $reference = Userlist::where('referral','=',$user->reference)->first();
+                    array_push($creators,[
+                        'user_id' => $user->user_id,
+                        'user_name' => $user->user_name,
+                        'phonecode' => $user->phonecode,
+                        'user_mob' => $user->user_mob,
+                        'points' => $user->points,
+                        'reference' => $reference->user_name,
+                        'refferedby' => $reference->user_id,
+                        'user_status' => $user->user_status,
+                    ]);
+                }
+                else{
+                    array_push($creators,[
+                        'user_id' => $user->user_id,
+                        'user_name' => $user->user_name,
+                        'phonecode' => $user->phonecode,
+                        'user_mob' => $user->user_mob,
+                        'points' => $user->points,
+                        'reference' => '',
+                        'refferedby' => '',
+                        'user_status' => $user->user_status,
+                    ]);
+                }
+                // array_push($creators,Userlist::find($id));
+            }
+        }
+        return response()->json($creators);
+    }
+
+    public function fetchRefferedByAJAX(Request $request){
+        $uid = $request->uid;
+        $result = Userlist::find($uid);
+        if($result){
+            $referrals = Userlist::where('reference','=',$result->referral)->get();
+            return response()->json([
+                'user_name' => $result->user_name,
+                'phone' => '+'.$result->phonecode.' '.$result->user_mob,
+                'total_ref' => sizeof($referrals),
+            ]);
+        }
+        else{
+            return response()->json('nouser');
+        }
+    }
+
+    public function blockUserAJAX(Request $request){
+        $uid = $request->uid;
+        $check = Userlist::find($uid);
+        if($check){
+            if($check->user_status == 'unblocked'){
+                $check->user_status = 'blocked';
+                $result = $check->update();
+                if($result){
+                    return response()->json('success');
+                }
+                else{
+                    return response()->json('fail');
+                }
+            }
+            else{
+                return response()->json('already-blocked');
+            }
+        }
+        else{
+            return response()->json('nouser');
+        }
+    }
+
+    public function unblockUserAJAX(Request $request){
+        $uid = $request->uid;
+        $check = Userlist::find($uid);
+        if($check){
+            if($check->user_status == 'blocked'){
+                $check->user_status = 'unblocked';
+                $result = $check->update();
+                if($result){
+                    return response()->json('success');
+                }
+                else{
+                    return response()->json('fail');
+                }
+            }
+            else{
+                return response()->json('already-unblocked');
+            }
+        }
+        else{
+            return response()->json('nouser');
+        }
+    }
+
+    public function loadAdminUserChatAJAX(Request $request){
+        $uid = $request->uid;
+        $user = Userlist::find($uid);
+        $chats = AdminChat::where('msg_from','=',$uid)
+                            ->orWhere('msg_to','=',$uid)
+                            ->get();
+        $chatArr = [];
+        foreach($chats as $chat){
+            if($chat->msg_from == $uid){
+                array_push($chatArr,[
+                    'sender' => 'user',
+                    'message' => $chat->message,
+                    'seen' => $chat->seen_flag,
+                    'time' => $chat->created_at,
+                    'uid' => $uid,
+                ]);
+            }
+            else{
+                array_push($chatArr,[
+                    'sender' => 'owner',
+                    'message' => $chat->message,
+                    'seen' =>  $chat->seen_flag,
+                    'time' => $chat->created_at,
+                ]);
+            }
+        }
+        return response()->json([
+            'username' => $user->user_name,
+            'chats' => $chatArr,
+        ]);
+    }
+
+    public function fetchViewersListAJAX(){
+        $users = Userlist::get();
+        $userids = [];
+        foreach($users as $user){
+            array_push($userids, $user->user_id);
+        }
+        $viewers = [];
+        foreach($userids as $id){
+            $check = Adds::where('user_id','=',$id)->first();
+            if(!$check){
+                array_push($viewers,Userlist::find($id));
+            }
+        }
+        return response()->json($viewers);
+    }
+
+    public function fetchUserRefferealListAJAX(Request $request){
+        $uid = $request->uid;
+        $refcode = Userlist::find($uid);
+        $refferedUsers = Userlist::where('reference',$refcode->referral)->get();
+        return response()->json([
+            'mainuser' => $refcode,
+            'reffered' => $refferedUsers,
+        ]);
+    }
+
+    public function fetchPointsHistoryAJAX(Request $request){
+        $uid = $request->uid;
+        $user = Userlist::find($uid);
+        if($user){
+            $points = PointsHistory::where('user_id','=',$uid)->get();
+            $history = [];
+            foreach($points as $pt){
+                if($pt->points_to == null){
+                    $from = '';
+                    if($pt->points_from == 'wb'){
+                        $from = 'Weekly Bonus';
+                    }
+                    else if($pt->points_from == 'jb'){
+                        $from = 'Joining Bonus';
+                    }
+                    else if($pt->points_from == 'av'){
+                        $from = 'Ads Visit';
+                    }
+                    array_push($history,[
+                        'from' => $from,
+                        'status' => 'credit',
+                        'points' => $pt->total_points,
+                    ]);
+                }
+            }
+            return response()->json([
+                'uid' => $uid,
+                'username' => $user->user_name,
+                'totalPoints' => $user->points,
+                'history' => $history,
+            ]);
         }
     }
 }

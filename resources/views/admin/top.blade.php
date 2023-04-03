@@ -205,86 +205,61 @@
                             </a>
                         </li>
                     </ul>
-                </li><!-- End Forms Nav -->
-
-                <li class="nav-item">
-                    <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse"
-                        href="#" aria-expanded="false">
-                        <i class="bi bi-layout-text-window-reverse"></i><span>Membership</span><i
-                            class="bi bi-chevron-down ms-auto"></i>
-                    </a>
-                    <ul id="tables-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                        <li>
-                            <a href="tables-general.html">
-                                <i class="bi bi-circle"></i><span>Plan</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="tables-data.html">
-                                <i class="bi bi-circle"></i><span>Custom Settings</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="tables-data.html">
-                                <i class="bi bi-circle"></i><span>Upgrade</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="tables-data.html">
-                                <i class="bi bi-circle"></i><span>Cron Logs</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li><!-- End Tables Nav -->
+                </li>
 
                 <li class="nav-item">
                     <a class="nav-link collapsed" href="users-profile.html">
-                        <i class="bi bi-person"></i>
-                        <span>Taxes</span>
+                        <i class="bi bi-person-lines-fill"></i>
+                        <span>Membership</span>
                     </a>
-                </li><!-- End Profile Page Nav -->
+                </li>
 
                 <li class="nav-item">
-                    <a class="nav-link collapsed" href="pages-faq.html">
-                        <i class="bi bi-question-circle"></i>
-                        <span>Payment Method</span>
+                    <a class="nav-link collapsed" data-bs-target="#members-nav" data-bs-toggle="collapse"
+                        href="#" aria-expanded="false">
+                        <i class="bi bi-person"></i><span>Members</span><i class="bi bi-chevron-down ms-auto"></i>
                     </a>
-                </li><!-- End F.A.Q Page Nav -->
+                    <ul id="members-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav" style="">
+                        <li>
+                            <a href="{{ url('admin/add-creators') }}">
+                                <i class="bi bi-circle"></i><span>Add Creators</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('admin/add-viewers') }}">
+                                <i class="bi bi-circle"></i><span>Add Viewers</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
 
                 <li class="nav-item">
-                    <a class="nav-link collapsed" href="pages-contact.html">
-                        <i class="bi bi-envelope"></i>
-                        <span>Contact</span>
+                    <a class="nav-link collapsed" href="users-profile.html">
+                        <i class="bi bi-cash-coin"></i>
+                        <span>Transactions</span>
                     </a>
-                </li><!-- End Contact Page Nav -->
+                </li>
 
                 <li class="nav-item">
-                    <a class="nav-link collapsed" href="pages-register.html">
-                        <i class="bi bi-card-list"></i>
-                        <span>Register</span>
+                    <a class="nav-link collapsed" href="users-profile.html">
+                        <i class="bi bi-cart-check"></i>
+                        <span>Redeem Request</span>
                     </a>
-                </li><!-- End Register Page Nav -->
+                </li>
 
                 <li class="nav-item">
-                    <a class="nav-link collapsed" href="pages-login.html">
-                        <i class="bi bi-box-arrow-in-right"></i>
-                        <span>Login</span>
+                    <a class="nav-link collapsed" href="users-profile.html">
+                        <i class="bi bi-clock-history"></i>
+                        <span>Redeem History</span>
                     </a>
-                </li><!-- End Login Page Nav -->
+                </li>
 
                 <li class="nav-item">
-                    <a class="nav-link collapsed" href="pages-error-404.html">
-                        <i class="bi bi-dash-circle"></i>
-                        <span>Error 404</span>
-                    </a>admin-chat-modal
-                </li><!-- End Error 404 Page Nav -->
-
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="pages-blank.html">
-                        <i class="bi bi-file-earmark"></i>
-                        <span>Blank</span>
+                    <a class="nav-link collapsed" href="users-profile.html">
+                        <i class="bi bi-gear"></i>
+                        <span>Settings</span>
                     </a>
-                </li><!-- End Blank Page Nav -->
+                </li>
 
             </ul>
 
@@ -380,7 +355,7 @@
                         uid: msgFrom,
                     },
                     success: function(res) {
-                        
+
                         console.log(res);
                         $('#viewChat').html(``);
                         $.each(res, function(key, value) {
