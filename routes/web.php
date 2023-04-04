@@ -18,6 +18,8 @@ Route::get('admin/resubmitted-ads',[AdminController::class,'resubmitedAdsView'])
 Route::get('admin/hidden-ads',[AdminController::class,'hiddenAdsView']);
 Route::get('admin/add-creators',[AdminController::class,'addCreatorsView']);
 Route::get('admin/add-viewers',[AdminController::class,'addViewersView']);
+Route::get('admin/membership',[AdminController::class,'membershipView']);
+Route::get('admin/add-membership-plan',[AdminController::class,'addMembershipPlanView']);
 
 // Fetch Routes
 Route::post('admin/check-login',[AdminController::class,'validateLogin']);
@@ -39,6 +41,8 @@ Route::post('admin/unblock-user',[AdminController::class,'unblockUserAJAX']);
 Route::post('admin/load-admin-user-chat',[AdminController::class,'loadAdminUserChatAJAX']);
 Route::post('admin/fetch-user-reffereal-list',[AdminController::class,'fetchUserRefferealListAJAX']);
 Route::post('admin/fetch-points-history',[AdminController::class,'fetchPointsHistoryAJAX']);
+Route::post('admin/fetch-membership-data',[AdminController::class,'fetchMembershipDataAJAX']);
+Route::post('admin/delete-membership',[AdminController::class,'deleteMembershipAJAX']);
 
 Route::post('admin/save-form-structure',[AdminController::class,'saveFormStructureAJAX']);
 
@@ -66,3 +70,4 @@ Route::post('admin/send-chats',[AdminController::class,'sendChatsAJAX']);
 Route::post('admin/open-chat-message',[AdminController::class,'openChatMessageAJAX']);
 Route::post('admin/load-new-chats-count',[AdminController::class,'loadNewChatsCountAJAX']);
 Route::post('admin/send-reply-from-admin',[AdminController::class,'sendReplyFromAdminAJAX']);
+Route::post('admin/add-new-membership-plan',[AdminController::class,'addNewMembershipPlanAJAX']);

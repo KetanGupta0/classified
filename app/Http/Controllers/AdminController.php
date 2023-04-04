@@ -17,6 +17,7 @@ use App\Models\Adds;
 use App\Models\FormSelect;
 use App\Models\Userlist;
 use App\Models\AdminChat;
+use App\Models\Membership;
 use App\Models\PointsHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -141,6 +142,26 @@ class AdminController extends Controller
         if (session::has('adminloginid')) {
             echo view('admin.top');
             echo view('admin.addviewers');
+            echo view('admin.bottom');
+        } else return redirect('/admin');
+    }
+
+    // Add Viewers View
+    public function membershipView()
+    {
+        if (session::has('adminloginid')) {
+            echo view('admin.top');
+            echo view('admin.membership');
+            echo view('admin.bottom');
+        } else return redirect('/admin');
+    }
+
+    // Add Viewers View
+    public function addMembershipPlanView()
+    {
+        if (session::has('adminloginid')) {
+            echo view('admin.top');
+            echo view('admin.addmembershipplan');
             echo view('admin.bottom');
         } else return redirect('/admin');
     }
@@ -685,7 +706,6 @@ class AdminController extends Controller
                         'user_status' => $user->user_status,
                     ]);
                 }
-                // array_push($creators,Userlist::find($id));
             }
         }
         return response()->json($creators);
@@ -785,22 +805,6 @@ class AdminController extends Controller
         ]);
     }
 
-    public function fetchViewersListAJAX(){
-        $users = Userlist::get();
-        $userids = [];
-        foreach($users as $user){
-            array_push($userids, $user->user_id);
-        }
-        $viewers = [];
-        foreach($userids as $id){
-            $check = Adds::where('user_id','=',$id)->first();
-            if(!$check){
-                array_push($viewers,Userlist::find($id));
-            }
-        }
-        return response()->json($viewers);
-    }
-
     public function fetchUserRefferealListAJAX(Request $request){
         $uid = $request->uid;
         $refcode = Userlist::find($uid);
@@ -842,6 +846,97 @@ class AdminController extends Controller
                 'totalPoints' => $user->points,
                 'history' => $history,
             ]);
+        }
+    }
+
+    public function fetchViewersListAJAX(){
+        $users = Userlist::get();
+        $userids = [];
+        foreach($users as $user){
+            array_push($userids, $user->user_id);
+        }
+        $viewers = [];
+        foreach($userids as $id){
+            $check = Adds::where('user_id','=',$id)->first();
+            if(!$check){
+                $user = Userlist::find($id);
+                if($user->reference!=null){
+                    $reference = Userlist::where('referral','=',$user->reference)->first();
+                    array_push($viewers,[
+                        'user_id' => $user->user_id,
+                        'user_name' => $user->user_name,
+                        'phonecode' => $user->phonecode,
+                        'user_mob' => $user->user_mob,
+                        'points' => $user->points,
+                        'reference' => $reference->user_name,
+                        'refferedby' => $reference->user_id,
+                        'user_status' => $user->user_status,
+                    ]);
+                }
+                else{
+                    array_push($viewers,[
+                        'user_id' => $user->user_id,
+                        'user_name' => $user->user_name,
+                        'phonecode' => $user->phonecode,
+                        'user_mob' => $user->user_mob,
+                        'points' => $user->points,
+                        'reference' => '',
+                        'refferedby' => '',
+                        'user_status' => $user->user_status,
+                    ]);
+                }
+            }
+        }
+        return response()->json($viewers);
+    }
+
+    public function fetchMembershipDataAJAX(){
+        $memberships = Membership::get();
+        return response()->json($memberships);
+    }
+
+    public function deleteMembershipAJAX(Request $request){
+        $mid = $request->mid;
+        $result = Membership::find($mid);
+        if($result){
+            $result->delete();
+            return response()->json('success');
+        }
+        else{
+            return response()->json('fail');
+        }
+    }
+    public function addNewMembershipPlanAJAX(Request $request){
+        $request->validate([
+            'name' => 'required',
+            'price' => 'required|numeric',
+            'days' => 'required|numeric',
+            'description' => 'required',
+        ],[
+            'name.required' => 'Name is required!',
+            'price.required' => 'Price is required!',
+            'days.required' => 'Days is required!',
+            'description.required' => 'Description is required!',
+            'price.numeric' => 'Price should be a number!',
+            'days.numeric' => 'Days should be a number!',
+        ]);
+        $name = $request->name;
+        $price = $request->price;
+        $days = $request->days;
+        $description = $request->description;
+
+        $check = Membership::create([
+            'm_plan' => $name,
+            'm_price' => $price,
+            'm_days' => $days,
+            'm_desc' => $description,
+        ]);
+
+        if($check){
+            return response()->json('success');
+        }
+        else{
+            return response()->json('fail');
         }
     }
 }

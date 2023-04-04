@@ -35,6 +35,7 @@
 
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
     <link href="{{ asset('public/admin/css/style.css') }}" rel="stylesheet">
+    <link href="{{ asset('public/admin/css/rte_theme_default.css') }}" rel="stylesheet">
     <script src="{{ asset('public/admin/sweatalert/sweetalert2.min.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('public/admin/sweatalert/sweetalert2.min.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css"
@@ -208,7 +209,7 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link collapsed" href="users-profile.html">
+                    <a class="nav-link collapsed" href="{{url('admin/membership')}}">
                         <i class="bi bi-person-lines-fill"></i>
                         <span>Membership</span>
                     </a>

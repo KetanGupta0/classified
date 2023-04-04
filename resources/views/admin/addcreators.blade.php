@@ -64,7 +64,7 @@
         </div>
         <div class="offcanvas-body" style="overflow: hidden;">
             <div class="container w-100 position-relative" id="viewChat2"
-                style="height: calc(100vh - 60px); padding-top: 15px; overflow-y:scroll;">
+                style="height: calc(100vh - 100px); padding-top: 15px; overflow-y:scroll;">
 
             </div>
         </div>
@@ -101,7 +101,6 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
                 </div>
             </div>
         </div>
@@ -211,12 +210,12 @@
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                url: "{{url('admin/fetch-points-history')}}",
+                url: "{{ url('admin/fetch-points-history') }}",
                 type: "POST",
-                data:{
+                data: {
                     uid: uid,
                 },
-                success: function(res){
+                success: function(res) {
                     $('#pointsHostoryBody').html(`
                         <div class="d-flex justify-content-between my-3">
                             <div><strong>Name: </strong>${res.username}</div>
@@ -224,16 +223,15 @@
                         </div>
                         <hr>
                     `);
-                    $.each(res.history,function(key,value){
-                        if(value.status == 'credit'){
+                    $.each(res.history, function(key, value) {
+                        if (value.status == 'credit') {
                             $('#pointsHostoryBody').append(`
                                 <div class="d-flex justify-content-between my-3">
                                     <div>${value.from}</div>
                                     <div>+${value.points}</div>
                                 </div>
                             `);
-                        }
-                        else{
+                        } else {
                             $('#pointsHostoryBody').append(`
                                 <div class="d-flex justify-content-between my-3">
                                     <div>${value.from}</div>
@@ -326,6 +324,13 @@
                                 $('#viewChat2').html('');
                                 $('#chat-modalLabel').html(res.username);
                                 $.each(res.chats, function(key, value) {
+                                    let time = timeCalc(value.time);
+                                    let seen = '';
+                                    if (value.seen == 0) {
+                                        seen = 'sent';
+                                    } else {
+                                        seen = 'seen';
+                                    }
                                     if (value.sender == 'user') {
                                         $('#viewChat2').append(`
                                             <div class="media mb-3 float-start">
