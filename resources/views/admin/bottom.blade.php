@@ -11,9 +11,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">CLOSE</button>
-        <a href="{{url('/logout')}}">
-            <button type="button" class="btn btn-primary">OK</button>
-        </a>
+        <a href="{{url('logout')}}" type="button" class="btn btn-primary">OK</a>
       </div>
     </div>
   </div>
@@ -25,7 +23,7 @@
     </div>
     <div class="credits">
 
-        Designed & Developed by <strong><span><a href="#">Specbits</a></span></strong>
+        Designed & Developed by <strong><span><a href="#">FAB</a></span></strong>
     </div>
 </footer><!-- End Footer -->
 

@@ -17,15 +17,13 @@
                                 <h3 class="text-light"
                                     style="font-size:15px;padding:10px 10px;border:1px solid #e8ebf0;border-radius:4px;margin-bottom:6px;background:#08c;border-color:#08c;">
                                     All Categories</h3>
-                                <div class="card p-2 mt-2" style="border:1px solid #e8ebf0; border-radius:4px;">
+                                <div class="card p-2 mt-2" id="dataRowContainer" style="border:1px solid #e8ebf0; border-radius:4px;">
                                     <div class="row ml-2" id="dataRow">
-                                    </div>
-                                    <div class="row ml-2" id="dataRow2">
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row" id="form_div" style="margin-left:-2px;">
+                        <div class="row" id="form_div" style="margin-left:-2px; margin-top: 20px;">
                         </div>
                         <div class="row" style="margin-left:-2px;" id="form_btn_submit">
                             <div class="col-md-12 mt-3">
@@ -69,6 +67,8 @@
     $(document).ready(function() {
         let lastcid = 1;
         $('#form_btn').hide();
+        $('#submit-form').hide();
+        $('#dataRowContainer').hide();
         $.ajax({
             'type': "POST",
             headers: {
@@ -245,11 +245,15 @@
                     if (data.length > 0) {
                         $('.nosub').hide();
                         $('.addsub').show();
+                        $('#dataRowContainer').show();
                         $('#form_btn').hide();
+                        $('#submit-form').hide();
                     } else {
                         $('.nosub').show();
                         $('.addsub').show();
                         $('#form_btn').show();
+                        $('#dataRowContainer').hide();
+                        $('#submit-form').show();
                         $.ajax({
                             url: "{{ url('/admin/fetchForm') }}",
                             type: "POST",
@@ -268,7 +272,7 @@
                                 <div class="row mb-2 p-2 border border-secondary"><div class="col-md-1 col-2 full" data="${value.cid}">
                                     <i class="fa-solid fa-bars" value="${value.cid}" id="info"></i>
                                 </div>
-                                <div class="col-md-8 col-7 full" style="white-space: nowrap;" data="${value.cid}">
+                                <div class="col-md-8 col-7 full" style="white-space: nowrap; cursor: pointer;" data="${value.cid}">
                                     ${value.title}
                                 </div>
                             </div>
@@ -389,7 +393,6 @@
     #dataRow {
         margin-left: 0.7rem !important;
     }
-
     .btn-outline-secondary {
         margin-left: 3px !important;
     }

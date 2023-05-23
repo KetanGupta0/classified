@@ -5,10 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Adminauth extends Model
+class PointsSetting extends Model
 {
     use HasFactory;
-    public $timestamps = false;
-    protected $table = "adminauths";
-    protected $primaryKey = "admin_id";
+    protected $table = 'points_settings';
+    protected $primaryKey = 'ps_id';
 }

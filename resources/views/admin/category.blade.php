@@ -16,14 +16,12 @@
 
                             <div class="card p-2 mt-2" style="border:1px solid #e8ebf0; border-radius:4px;">
                                 <div class="row ml-2" id="dataRow">
-
-
-
                                 </div>
                             </div>
 
-                            <button type="button" class="btn btn-outline-success w-100 popovers" data-bs-container="body"
-                                data-toggle="popover" data-bs-placement="bottom" id="over">
+                            <button type="button" class="btn btn-outline-success w-100 popovers"
+                                data-bs-container="body" data-toggle="popover" data-bs-placement="bottom"
+                                id="over">
                                 New Category
                             </button>
 
@@ -34,6 +32,10 @@
                                         <input type="hidden" name="id" class="form-control" value="0">
                                         <input type="hidden" name="ccid" class="form-control cid" value="0">
                                         <input type="text" name="title" class="form-control" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="">Title (Arabic)</label>
+                                        <input type="text" name="arabic" class="form-control" required>
                                     </div>
                                     <div class="form-group">
                                         <label for="">Slug</label>
@@ -65,19 +67,20 @@
                                         <h5 class="text-dark">All Categories</h5>
                                     </div>
                                     <div class="col-md-6 text-end addsub" style="display:none;" id="">
-                                        
-                                        
-                                         <button type="button" class="btn btn-outline-success w-100 popovers2" data-bs-container="body"
-                                data-toggle="popover" data-bs-placement="bottom" id="over" data-cid="0">
-                                 <i class="fa-sharp fa-solid fa-plus"></i> Add Sub-Category
-                            </button>
+
+
+                                        <button type="button" class="btn btn-outline-success w-100 popovers2"
+                                            data-bs-container="body" data-toggle="popover" data-bs-placement="bottom"
+                                            id="over" data-cid="0">
+                                            <i class="fa-sharp fa-solid fa-plus"></i> Add Sub-Category
+                                        </button>
                                     </div>
                                 </div>
-                                 <div class="row" id="dataRow2">
-                                     </div>
+                                <div class="row" id="dataRow2">
+                                </div>
                                 <h5 class="mt-4 nosub text-center">No sub category found.</h5>
 
-                                
+
                             </div>
                         </div>
                     </div>
@@ -103,8 +106,8 @@
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-    
-       
+
+
 
     $(function() {
         $('[data-toggle="popover"]').popover({
@@ -148,40 +151,32 @@
                 'url': "{{ url('admin/fetch-category-data') }}",
                 success: function(data) {
                     $('#dataRow').html("");
-           
+
                     $.each(data, function(key, value) {
-                        $('#dataRow').append(`<div class="row mb-2 p-2 border border-secondary"><div class="col-md-1 col-2 full" data="${value.cid}">
+                        $('#dataRow').append(`
+                            <div class="row mb-2 p-2 border border-secondary">
+                                <div class="col-md-1 col-2 full" data="${value.cid}">
                                         <i class="fa-solid fa-bars" value="${value.cid}" id="info"></i>
+                                </div>
+                                <div class="col-md-8 col-7 full" style="white-space: nowrap;cursor:pointer;" data="${value.cid}">${value.title}</div>
+                                <div class="col-md-3 col-3">
+                                    <div class="text-end" style="white-space: nowrap;">
+                                    <i class="fa-solid fa-pen-to-square text-primary editData" style="font-size: 20px;cursor:pointer;" title="Edit" id="${value.cid}"></i>
+                                    <i class="fa-solid fa-language text-success" style="font-size: 20px;cursor:pointer;"
+                                        title="edit-language" value="${value.cid}" id="editlan"></i>
+                                    <i class="fa-solid fa-trash text-danger delete" style="font-size: 20px;cursor:pointer;"
+                                        title="Delete" value="${value.cid}"></i>
                                     </div>
-
-                                    <div class="col-md-8 col-7 full" style="white-space: nowrap;" data="${value.cid}">
-                                        ${value.title}
-                                    </div>
-
-
-                                    
-
-                                    <div class="col-md-3 col-3">
-
-                                        <div class="text-end" style="white-space: nowrap;">
-                                        <i class="fa-solid fa-pen-to-square text-primary editData" style="font-size: 20px;cursor:pointer;" title="Edit" id="${value.cid}"></i>
-
-                                        <i class="fa-solid fa-language text-success" style="font-size: 20px;cursor:pointer;"
-                                            title="edit-language" value="${value.cid}" id="editlan"></i>
-
-                                            
-                                        <i class="fa-solid fa-trash text-danger" style="font-size: 20px;cursor:pointer;"
-                                            title="Delete" value="${value.cid}" id="delete"></i>
-                                        </div>
-
-                                        
-                                    </div>
-
-                                    <div class="col-md-12 mt-2 mb-2 editClass" id="div${value.cid}" style="display:none;">
-
+                                </div>
+                                <div class="col-md-12 mt-2 mb-2 editClass" id="div${value.cid}" style="display:none;">
+                                    <form enctype="multipart/form-data">
                                         <div class="form-group">
                                             <label for="">Title</label>
                                             <input type="text" id="utitle" class="form-control" value="${value.title}" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">Title (Arabic)</label>
+                                            <input type="text" id="arabic" class="form-control" value="${value.arabic}" required>
                                         </div>
                                         <div class="form-group">
                                             <label for="">Slug</label>
@@ -192,24 +187,28 @@
                                             <input type="text" id="uicon" class="form-control" value='${value.icon}' required>
                                         </div>
                                         <div class="form-group">
-                                            <label for="">Picture url</label>
-                                            <input type="text" id="upurl" class="form-control" value="${value.purl}">
+                                            <label for="">Picture</label>
+                                            <div class="">
+                                                <img src="{{ asset('public/category/image/${value.purl}') }}" height="200" width="350" alt="Image Placeholder">
+                                            </div>
                                         </div>
-
-                                        <div class="text-end mt-2">
-                                            <button class="btn btn-success updateSave" data="${value.cid}">Update</button>
-                                            <button type="button" class="btn btn-light close"
-                                                style="border:1px solid #d9dee4;">Cancel</button>
-
+                                        <div class="form-group">
+                                            <label for="formFile" class="form-label">Change picture</label>
+                                            <input class="form-control" type="file" accept="image/*" id="formFile">
                                         </div>
+                                    </form>
+                                    <div class="text-end mt-2">
+                                        <button class="btn btn-success updateSave" data="${value.cid}">Update</button>
+                                        <button type="button" class="btn btn-light close"
+                                            style="border:1px solid #d9dee4;">Cancel</button>
                                     </div>
-                                    </div>`);
+                                </div>
+                            </div>
+                        `);
                     });
                 }
             });
         }
-
-
         $(document).on('submit', '.categoryForm:eq(1)', function(e) {
             e.preventDefault();
             let formData = new FormData($('.categoryForm:eq(1)')[0]);
@@ -244,65 +243,108 @@
                 }
             });
         });
-
         $(document).on('click', '.editData', function() {
             let cid = $(this).attr('id');
-             $('.editClass').hide();
-            $('#div'+cid).show();
-           
+            $('.editClass').hide();
+            $('#div' + cid).show();
+
         });
-        
         $(document).on('click', '.close', function() {
-             $('.editClass').hide();
+            $('.editClass').hide();
         });
-        
         $(document).on('click', '.closepop', function() {
-             $('.popovers').click();
+            $('.popovers').click();
         });
-        
-        
-        
-        
-         $(document).on('click', '.full', function() {
-             let cid = $(this).attr('data');
-             fetchCategoryData2(cid);
-              $(".popovers2").attr('data-cid', cid);
+        $(document).on('click', '.full', function() {
+            let cid = $(this).attr('data');
+            fetchCategoryData2(cid);
+            $(".popovers2").attr('data-cid', cid);
         });
-        
         $(document).on('click', '.popovers', function() {
-               
+
             $('.hide').show();
         });
-        
         $(document).on('click', '.popovers2', function() {
             let cid = $(this).attr('data-cid');
             console.log(cid);
             $('.cid').val(cid);
-           $('.hide').hide();  
+            $('.hide').hide();
         });
-        
-        $(document).on('click', '.updateSave', function() {
-             let cid = $(this).attr('data');
-             var title = $('#div'+cid+' #utitle').val();
-             var slug = $('#div'+cid+' #uslug').val();
-             var icon = $('#div'+cid+' #uicon').val();
-             var url = $('#div'+cid+' #purl').val();
-             var parent = $('#div'+cid+' #parent').val();
-             
-              $.ajax({
-                'type': "POST",
-                'url': "{{ url('admin/update-category') }}",
-                data: {cid:cid,
-                      title:title,
-                       slug:slug,
-                       icon:icon,
-                       url:url
+        $(document).on('click', '.delete', function() {
+            let cid = $(this).attr('value');
+            const swalWithBootstrapButtons = Swal.mixin({
+                customClass: {
+                    confirmButton: 'btn btn-success',
+                    cancelButton: 'btn btn-danger'
                 },
+                buttonsStyling: false
+            })
+            swalWithBootstrapButtons.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post("{{ url('admin/delete-cat-data') }}", {
+                        cid: cid
+                    }, function(res) {
+                        if (res == 'pass') {
+                            Swal.fire({
+                                position: 'top-end',
+                                icon: 'success',
+                                text: 'Category Deleted!!',
+                                showConfirmButton: false,
+                                timer: 1000
+                            })
+                            fetchCategoryData();
+                        } else {
+                            Swal.fire({
+                                position: 'top-end',
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Something went wrong!'
+                            })
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Cancelled',
+                        text: 'Operation canceled by user!'
+                    })
+                }
+            })
+        });
+        $(document).on('click', '.updateSave', function() {
+            let cid = $(this).attr('data');
+            var title = $('#div' + cid + ' #utitle').val();
+            var arabic = $('#div' + cid + ' #arabic').val();
+            var slug = $('#div' + cid + ' #uslug').val();
+            var icon = $('#div' + cid + ' #uicon').val();
+            var parent = $('#div' + cid + ' #parent').val();
+            let formData = new FormData();
+            let purl = $('#div' + cid + ' #formFile')[0].files[0];
+            formData.append('cid', cid);
+            formData.append('title', title);
+            formData.append('arabic', arabic);
+            formData.append('slug', slug);
+            formData.append('icon', icon);
+            formData.append('purl', purl);
+            $.ajax({
+                type: "POST",
+                url: "{{ url('admin/update-category') }}",
+                data: formData,
+                contentType: false,
+                processData: false,
                 success: function(response) {
                     if (response == true) {
                         fetchCategoryData();
-                        if(icon+url == 'nullundefined'){
-                          fetchCategoryData2(parent);
+                        if (icon + purl == 'nullundefined') {
+                            fetchCategoryData2(parent);
                         }
                         $('.editClass').hide();
                         Swal.fire({
@@ -311,98 +353,80 @@
                             text: 'Category Updated!!',
                             showConfirmButton: false,
                             timer: 1000
-                        })
+                        });
                     } else {
                         Swal.fire({
                             position: 'top-end',
                             icon: 'error',
                             title: 'Oops...',
                             text: 'Something went wrong!'
-                        })
+                        });
                     }
                 }
             });
-             
-              
         });
-        
-        function fetchCategoryData2(parent){
+
+        function fetchCategoryData2(parent) {
             var cid = parent;
-             $.ajax({
+            $.ajax({
                 'type': "POST",
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 'url': "{{ url('admin/fetch-subcategory-data') }}",
-                data: {cid:cid},
+                data: {
+                    cid: cid
+                },
                 success: function(data) {
-                    if(data.length > 0){
+                    if (data.length > 0) {
                         $('.nosub').hide();
                         $('.addsub').show();
-                    }
-                    else{
-                       $('.nosub').show();
-                        $('.addsub').show(); 
+                    } else {
+                        $('.nosub').show();
+                        $('.addsub').show();
                     }
                     $('#dataRow2').html("");
-           
+
                     $.each(data, function(key, value) {
-                        $('#dataRow2').append(`<div class="row mb-2 p-2 border border-secondary"><div class="col-md-1 col-2 full" data="${value.cid}">
-                                        <i class="fa-solid fa-bars" value="${value.cid}" id="info"></i>
-                                    </div>
-
-                                    <div class="col-md-8 col-7 full" style="white-space: nowrap;" data="${value.cid}">
-                                        ${value.title}
-                                    </div>
-
-
-                                    
-
-                                    <div class="col-md-3 col-3">
-
-                                        <div class="text-end" style="white-space: nowrap;">
+                        $('#dataRow2').append(`
+                            <div class="row mb-2 p-2 border border-secondary">
+                                <div class="col-md-1 col-2 full" data="${value.cid}">
+                                    <i class="fa-solid fa-bars" value="${value.cid}" id="info"></i>
+                                </div>
+                                <div class="col-md-8 col-7 full" style="white-space: nowrap; cursor: pointer;" data="${value.cid}">${value.title}</div>
+                                <div class="col-md-3 col-3">
+                                    <div class="text-end" style="white-space: nowrap;">
                                         <i class="fa-solid fa-pen-to-square text-primary editData" style="font-size: 20px;cursor:pointer;" title="Edit" id="${value.cid}"></i>
-
-                                        <i class="fa-solid fa-language text-success" style="font-size: 20px;cursor:pointer;"
-                                            title="edit-language" value="${value.cid}" id="editlan"></i>
-
-                                            
-                                        <i class="fa-solid fa-trash text-danger" style="font-size: 20px;cursor:pointer;"
-                                            title="Delete" value="${value.cid}" id="delete"></i>
-                                        </div>
-
-                                        
+                                        <i class="fa-solid fa-language text-success" style="font-size: 20px;cursor:pointer;" title="edit-language" value="${value.cid}" id="editlan"></i>
+                                        <i class="fa-solid fa-trash text-danger delete" style="font-size: 20px;cursor:pointer;" title="Delete" value="${value.cid}"></i>
                                     </div>
-
-                                    <div class="col-md-12 mt-2 mb-2 editClass" id="div${value.cid}" style="display:none;">
-
-                                        <div class="form-group">
-                                            <label for="">Title</label>
-                                            <input type="text" id="utitle" class="form-control" value="${value.title}" required>
-                                            <input type="hidden" id="uslug" class="form-control" value="${value.slug}" required>
-                                            <input type="hidden" id="uicon" class="form-control" value='${value.icon}' required>
-                                            <input type="hidden" id="upurl" class="form-control" value="${value.purl}">
-                                            <input type="hidden" id="parent" class="form-control" value="${value.parent}">
-                                        </div>
-                                        <div class="text-end mt-2">
-                                            <button class="btn btn-success updateSave" data="${value.cid}">Update</button>
-                                            <button type="button" class="btn btn-light close"
-                                                style="border:1px solid #d9dee4;">Cancel</button>
-
-                                        </div>
+                                </div>
+                                <div class="col-md-12 mt-2 mb-2 editClass" id="div${value.cid}" style="display:none;">
+                                    <div class="form-group">
+                                        <label for="">Title</label>
+                                        <input type="text" id="utitle" class="form-control" value="${value.title}" required>
+                                        <input type="text" id="arabic" class="form-control" value="${value.arabic}" required>
+                                        <input type="hidden" id="uslug" class="form-control" value="${value.slug}" required>
+                                        <input type="hidden" id="uicon" class="form-control" value='${value.icon}' required>
+                                        <input type="hidden" id="upurl" class="form-control" value="${value.purl}">
+                                        <input type="hidden" id="parent" class="form-control" value="${value.parent}">
                                     </div>
-                                    </div>`);
+                                    <div class="text-end mt-2">
+                                        <button class="btn btn-success updateSave" data="${value.cid}">Update</button>
+                                        <button type="button" class="btn btn-light close" style="border:1px solid #d9dee4;">Cancel</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
                     });
                 }
             });
         }
-
-
-
     });
 </script>
 <style>
-    #dataRow,#dataRow2{
+    #dataRow,
+    #dataRow2 {
         margin-left: 0.7rem !important;
     }
 </style>

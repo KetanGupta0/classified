@@ -28,12 +28,14 @@
     <link href="{{ asset('public/admin/vendor/quill/quill.bubble.css') }}" rel="stylesheet">
     <link href="{{ asset('public/admin/vendor/remixicon/remixicon.css') }}" rel="stylesheet">
     <link href="{{ asset('public/admin/vendor/bootstrap/css/chat-modal.css') }}" rel="stylesheet">
-
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    
     {{-- <script src=" https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js "></script> --}}
-
+    
     <!-- Template Main CSS File -->
-
+    
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <link href="{{ asset('public/admin/css/style.css') }}" rel="stylesheet">
     <link href="{{ asset('public/admin/css/rte_theme_default.css') }}" rel="stylesheet">
     <script src="{{ asset('public/admin/sweatalert/sweetalert2.min.js') }}"></script>
@@ -53,7 +55,6 @@
         <div class="d-flex align-items-center justify-content-between">
             <a href="index.html" class="logo d-flex align-items-center">
                 <img src="{{ asset('public/admin/img/logo.png') }}" alt="">
-                <span class="d-none d-lg-block">NiceAdmin</span>
             </a>
             <i class="bi bi-list toggle-sidebar-btn"></i>
         </div>
@@ -209,7 +210,7 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link collapsed" href="{{url('admin/membership')}}">
+                    <a class="nav-link collapsed" href="{{ url('admin/membership') }}">
                         <i class="bi bi-person-lines-fill"></i>
                         <span>Membership</span>
                     </a>
@@ -235,31 +236,66 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link collapsed" href="users-profile.html">
+                    <a class="nav-link collapsed" href="{{url('admin/transaction')}}">
                         <i class="bi bi-cash-coin"></i>
                         <span>Transactions</span>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link collapsed" href="users-profile.html">
+                    <a class="nav-link collapsed" href="{{url('admin/redeem-request')}}">
                         <i class="bi bi-cart-check"></i>
                         <span>Redeem Request</span>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link collapsed" href="users-profile.html">
+                    <a class="nav-link collapsed" href="{{url('admin/redeem-history')}}">
                         <i class="bi bi-clock-history"></i>
                         <span>Redeem History</span>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link collapsed" href="users-profile.html">
-                        <i class="bi bi-gear"></i>
-                        <span>Settings</span>
+                    <a class="nav-link collapsed" data-bs-target="#settings-nav" data-bs-toggle="collapse"
+                        href="#" aria-expanded="false">
+                        <i class="bi bi-gear"></i><span>Settings</span><i class="bi bi-chevron-down ms-auto"></i>
                     </a>
+                    <ul id="settings-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav" style="">
+                        <li>
+                            <a href="{{url('admin/ads-view-settings')}}">
+                                <i class="bi bi-circle"></i><span>Add View Settings</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{url('admin/redeem-settings')}}">
+                                <i class="bi bi-circle"></i><span>Redeem Settings</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-link collapsed" data-bs-target="#user-management-nav" data-bs-toggle="collapse"
+                                href="#" aria-expanded="false">
+                                <i class="bi bi-person fs-6"></i><span>User Management</span><i class="bi bi-chevron-down ms-auto fs-6"></i>
+                            </a>
+                            <ul id="user-management-nav" class=" collapse" data-bs-parent="#user-management-nav" style="">
+                                <li>
+                                    <a href="{{url('admin/create-user')}}">
+                                        <i class="bi bi-circle"></i><span>Create User</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{url('admin/manage-rights')}}">
+                                        <i class="bi bi-circle"></i><span>Manage Rights</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="{{url('admin/reset-password')}}">
+                                <i class="bi bi-circle"></i><span>Reset Password</span>
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
             </ul>
@@ -270,13 +306,15 @@
     </aside>
 
     <!-- Modal -->
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
-        <div class="offcanvas-header">
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasRight" aria-labelledby="chat-modalLabel">
+        <div class="offcanvas-header" style="height: 60px;">
             <h5 class="offcanvas-title" id="offcanvasRightLabel">Admin Chat Panel</h5>
+
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-        <div class="offcanvas-body">
-            <div class="container w-100 position-relative" id='viewChat'>
+        <div class="offcanvas-body" style="overflow: hidden;">
+            <div class="container w-100 position-relative" id="viewChat"
+                style="height: calc(100vh - 100px); padding-top: 15px; overflow-y:scroll; overflow-x:hidden;">
 
             </div>
         </div>
@@ -291,6 +329,38 @@
         });
         $(document).ready(function() {
             let totalMsgs = 0;
+
+            function timeCalc(time) {
+                let timestamp = new Date(time).getTime();
+                let now = Date.now();
+                let diff = now - timestamp;
+
+                let seconds = Math.floor(diff / 1000);
+                let minutes = Math.floor(seconds / 60);
+                let hours = Math.floor(minutes / 60);
+                let days = Math.floor(hours / 24);
+
+                let result;
+
+                if (days > 1) {
+                    result = `${days} days ago`;
+                } else if (days === 1) {
+                    result = `1 day ago`;
+                } else if (hours > 1) {
+                    result = `${hours} hours ago`;
+                } else if (hours === 1) {
+                    result = `1 hour ago`;
+                } else if (minutes > 1) {
+                    result = `${minutes} minutes ago`;
+                } else if (minutes === 1) {
+                    result = `1 minute ago`;
+                } else if (seconds > 5) {
+                    result = `${seconds} seconds ago`;
+                } else {
+                    result = `just now`;
+                }
+                return result;
+            }
 
             function loadChat() {
                 $.ajax({
@@ -312,7 +382,6 @@
                     url: "{{ url('admin/load-chats') }}",
                     type: "POST",
                     success: function(res) {
-                        console.log(res);
                         let count = 0;
                         $.each(res, function(key, value) {
                             count++;
@@ -332,15 +401,18 @@
                                 </li>
                             `);
                         });
-                        if (totalMsgs <= 1) {
+                        if (totalMsgs >= 1) {
                             $('#new-msg').html(`
                                 You have ${totalMsgs} new message from ${count} chat
-                                <a href="#" class="badge rounded-pill bg-primary p-2 ms-2 text-light">View all</a>
                             `);
                         } else {
                             $('#new-msg').html(`
-                                You have ${totalMsgs} new messages from ${count} chats
-                                <a href="#" class="badge rounded-pill bg-primary p-2 ms-2 text-light">View all</a>
+                                You have ${totalMsgs} new message from ${count} chat
+                            `);
+                            $('#chat-msg').html(`
+                                <div class="text-center my-3">
+                                    No new message
+                                </div>
                             `);
                         }
                     }
@@ -356,26 +428,34 @@
                         uid: msgFrom,
                     },
                     success: function(res) {
-
                         console.log(res);
                         $('#viewChat').html(``);
                         $.each(res, function(key, value) {
+                            let time = timeCalc(value.seen_time);
+                            let seen = '';
+                            if (value.seen == 0) {
+                                seen = 'sent';
+                            } else {
+                                seen = 'seen';
+                            }
                             if (value.sender != 'admin') {
                                 uid = value.uid;
                                 $('#viewChat').append(`
                                 <div class="media mb-3 float-start">
-                                    <div class="media-body bg-info text-dark rounded p-4" style="width: 15rem;">
-                                        <h5 class="mt-0">${value.sender}</h5>
-                                        ${value.message}
+                                    <div class="media-body text-light" style="padding: 10px 15px 2px 15px; width: 15rem; border-radius: 2px 16px 16px 16px; background-color: #f56969; word-wrap:wrap; overflow-wrap: break-word;">
+                                        <h6 class="mt-0">${value.sender}</h6>
+                                        <h5>${value.message}</h5>
+                                        <p style="font-size: 12px;"><span>${seen}</span> <span>${time}</span></p>
                                     </div>
                                 </div>
                                 `);
                             } else {
                                 $('#viewChat').append(`
                                 <div class="media mb-3 float-end">
-                                    <div class="media-body bg-info text-dark rounded p-4" style="width: 15rem;">
-                                        <h5 class="mt-0">You</h5>
-                                        ${value.message}
+                                    <div class="media-body text-light" style="padding: 10px 15px 2px 15px; width: 15rem; border-radius: 16px 2px 16px 16px; background-color: #525252; word-wrap:wrap; overflow-wrap: break-word;">
+                                        <h6 class="mt-0">You</h6>
+                                        <h5>${value.message}</h5>
+                                        <p style="font-size: 12px;"><span>${time}</span></p>
                                     </div>
                                 </div>
                                 `);
@@ -391,9 +471,26 @@
                                 </div>
                             </form>
                         `);
+                        // scroll to the bottom of the chat box
+                        $('#viewChat').animate({
+                            scrollTop: $('#viewChat').prop('scrollHeight')
+                        }, 1500);
                     }
                 });
             });
+            $(document).on('keypress', '.msg', function(e) {
+                if (e.which == 13) {
+                    e.preventDefault();
+                    $(this).closest('form').find('.msg-btn').click();
+                    // scroll to the bottom of the chat box
+                    $('#viewChat').animate({
+                        scrollTop: $('#viewChat').prop('scrollHeight')
+                    }, 1500);
+
+                }
+            });
+
+
             $(document).on('click', '.msg-btn', function() {
                 let uid = $('#sendReplyFromAdmin').attr('user');
                 let msg = $('.msg').val();
@@ -417,24 +514,33 @@
                                     console.log(res);
                                     $('#viewChat').html(``);
                                     $.each(res, function(key, value) {
+                                        let time = timeCalc(value.seen_time);
+                                        let seen = '';
+                                        if (value.seen == 0) {
+                                            seen = 'sent';
+                                        } else {
+                                            seen = 'seen';
+                                        }
                                         if (value.sender != 'admin') {
                                             uid = value.uid;
                                             $('#viewChat').append(`
-                                            <div class="media mb-3 float-start">
-                                                <div class="media-body bg-info text-dark rounded p-4" style="width: 15rem;">
-                                                    <h5 class="mt-0">${value.sender}</h5>
-                                                    ${value.message}
+                                                <div class="media mb-3 float-start">
+                                                    <div class="media-body text-light" style="padding: 10px 15px 2px 15px; width: 15rem; border-radius: 2px 16px 16px 16px; background-color: #f56969; word-wrap:wrap; overflow-wrap: break-word;">
+                                                        <h6 class="mt-0">${value.sender}</h6>
+                                                        <h5>${value.message}</h5>
+                                                        <p style="font-size: 12px;"><span>${time}</span></p>
+                                                    </div>
                                                 </div>
-                                            </div>
                                             `);
                                         } else {
                                             $('#viewChat').append(`
-                                            <div class="media mb-3 float-end">
-                                                <div class="media-body bg-info text-dark rounded p-4" style="width: 15rem;">
-                                                    <h5 class="mt-0">You</h5>
-                                                    ${value.message}
+                                                <div class="media mb-3 float-end">
+                                                    <div class="media-body text-light" style="padding: 10px 15px 2px 15px; width: 15rem; border-radius: 16px 2px 16px 16px; background-color: #525252; word-wrap:wrap; overflow-wrap: break-word;">
+                                                        <h6 class="mt-0">You</h6>
+                                                        <h5>${value.message}</h5>
+                                                        <p style="font-size: 12px;"><span>${seen}</span> <span>${time}</span></p>
+                                                    </div>
                                                 </div>
-                                            </div>
                                             `);
                                         }
                                     });
@@ -448,6 +554,11 @@
                                             </div>
                                         </form>
                                     `);
+                                    // scroll to the bottom of the chat box
+                                    $('#viewChat').animate({
+                                        scrollTop: $('#viewChat').prop(
+                                            'scrollHeight')
+                                    }, 1500);
                                 }
                             });
                         } else {

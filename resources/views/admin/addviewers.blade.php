@@ -64,7 +64,7 @@
         </div>
         <div class="offcanvas-body" style="overflow: hidden;">
             <div class="container w-100 position-relative" id="viewChat2"
-                style="height: calc(100vh - 100px); padding-top: 15px; overflow-y:scroll;">
+                style="height: calc(100vh - 100px); padding-top: 15px; overflow-y:scroll; overflow-x:hidden;">
 
             </div>
         </div>
@@ -223,23 +223,31 @@
                         </div>
                         <hr>
                     `);
-                    $.each(res.history, function(key, value) {
-                        if (value.status == 'credit') {
-                            $('#pointsHostoryBody').append(`
-                                <div class="d-flex justify-content-between my-3">
-                                    <div>${value.from}</div>
-                                    <div>+${value.points}</div>
-                                </div>
-                            `);
-                        } else {
-                            $('#pointsHostoryBody').append(`
-                                <div class="d-flex justify-content-between my-3">
-                                    <div>${value.from}</div>
-                                    <div>-${value.points}</div>
-                                </div>
-                            `);
-                        }
-                    });
+                    if(res.history.length == 0){
+                        $('#pointsHostoryBody').append(`
+                            <div class="text-center my-3">
+                                <p>No History</p>
+                            </div>
+                        `);
+                    } else {
+                        $.each(res.history, function(key, value) {
+                            if (value.credited_points > 0 && value.deducted_points == 0) {
+                                $('#pointsHostoryBody').append(`
+                                    <div class="d-flex justify-content-between my-3">
+                                        <div>${value.points_for}</div>
+                                        <div>+${value.credited_points}</div>
+                                    </div>
+                                `);
+                            } else if (value.credited_points == 0 && value.deducted_points > 0) {
+                                $('#pointsHostoryBody').append(`
+                                    <div class="d-flex justify-content-between my-3">
+                                        <div>${value.points_for}</div>
+                                        <div>-${value.deducted_points}</div>
+                                    </div>
+                                `);
+                            }
+                        });
+                    }
                 },
             });
         });
@@ -268,7 +276,7 @@
                         if (value.sender == 'user') {
                             $('#viewChat2').append(`
                             <div class="media mb-3 float-start">
-                                <div class="media-body text-light" style="padding: 10px 15px 2px 15px; width: 15rem; border-radius: 2px 16px 16px 16px; background-color: #f56969;">
+                                <div class="media-body text-light" style="padding: 10px 15px 2px 15px; width: 15rem; border-radius: 2px 16px 16px 16px; background-color: #f56969; word-wrap:wrap; overflow-wrap: break-word;">
                                     <h6 class="mt-0">${value.sender}</h6>
                                     <h5>${value.message}</h5>
                                     <p style="font-size: 12px;"><span>${time}</span></p>
@@ -278,7 +286,7 @@
                         } else {
                             $('#viewChat2').append(`
                             <div class="media mb-3 float-end">
-                                <div class="media-body text-light" style="padding: 10px 15px 2px 15px; width: 15rem; border-radius: 16px 2px 16px 16px; background-color: #525252;">
+                                <div class="media-body text-light" style="padding: 10px 15px 2px 15px; width: 15rem; border-radius: 16px 2px 16px 16px; background-color: #525252; word-wrap:wrap; overflow-wrap: break-word;">
                                     <h6 class="mt-0">You</h6>
                                     <h5>${value.message}</h5>
                                     <p style="font-size: 12px;"><span>${seen}</span> <span>${time}</span></p>
@@ -297,8 +305,7 @@
                             </div>
                         </form>
                     `);
-                    let chatBox = document.getElementById("viewChat2");
-                    chatBox.scrollTop = chatBox.scrollHeight;
+                    $('#viewChat2').animate({scrollTop: $('#viewChat2').prop('scrollHeight')}, 1500);
                 }
             });
         });
@@ -334,7 +341,7 @@
                                     if (value.sender == 'user') {
                                         $('#viewChat2').append(`
                                             <div class="media mb-3 float-start">
-                                                <div class="media-body text-light" style="padding: 10px 15px 2px 15px; width: 15rem; border-radius: 2px 16px 16px 16px; background-color: #f56969;">
+                                                <div class="media-body text-light" style="padding: 10px 15px 2px 15px; width: 15rem; border-radius: 2px 16px 16px 16px; background-color: #f56969; word-wrap:wrap; overflow-wrap: break-word;">
                                                     <h6 class="mt-0">${value.sender}</h6>
                                                     <h5>${value.message}</h5>
                                                     <p style="font-size: 12px;"><span>${time}</span></p>
@@ -344,7 +351,7 @@
                                     } else {
                                         $('#viewChat2').append(`
                                             <div class="media mb-3 float-end">
-                                                <div class="media-body text-light" style="padding: 10px 15px 2px 15px; width: 15rem; border-radius: 16px 2px 16px 16px; background-color: #525252;">
+                                                <div class="media-body text-light" style="padding: 10px 15px 2px 15px; width: 15rem; border-radius: 16px 2px 16px 16px; background-color: #525252; word-wrap:wrap; overflow-wrap: break-word;">
                                                     <h6 class="mt-0">You</h6>
                                                     <h5>${value.message}</h5>
                                                     <p style="font-size: 12px;"><span>${seen}</span> <span>${time}</span></p>
@@ -363,9 +370,7 @@
                                         </div>
                                     </form>
                                 `);
-                                let chatBox = document.getElementById(
-                                    "viewChat2");
-                                chatBox.scrollTop = chatBox.scrollHeight;
+                                $('#viewChat2').animate({scrollTop: $('#viewChat2').prop('scrollHeight')}, 1500);
                             }
                         });
                     } else {
@@ -430,6 +435,17 @@
                 }
             })
         });
+        $(document).on('keypress', '.send-msg', function(e) {
+                if (e.which == 13) {
+                    e.preventDefault();
+                    $(this).closest('form').find('.send-msg-btn').click();
+                    // scroll to the bottom of the chat box
+                    $('#viewChat2').animate({
+                        scrollTop: $('#viewChat2').prop('scrollHeight')
+                    }, 1500);
+
+                }
+            });
         $(document).on('click', '.reffered-by', function() {
             let uid = $(this).attr('data');
             $.ajax({

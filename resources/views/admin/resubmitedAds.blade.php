@@ -29,19 +29,23 @@
                         </div>
                         <!-- End Table with stripped rows -->
                         <!-- Modal -->
-                        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false"
+                            tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                             <div class="modal-dialog modal-xl">
                                 <div class="modal-content" id="ads-view-modal">
                                     <div class="modal-header">
-                                        <h1 class="modal-title fs-5" id="staticBackdropLabel"><span id="ads-owner-name">Unknown</span></h1>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        <h1 class="modal-title fs-5" id="staticBackdropLabel"><span
+                                                id="ads-owner-name">Unknown</span></h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
                                     </div>
                                     <div class="modal-body" id="ads-viewer">
                                         <div class="container-fluid">
                                             <h2 id="ads-title">Add Title</h2>
                                         </div>
                                         <div class="container-fluid d-flex flex-wrap mt-3" id="ads-images">
-                                            <img src="..." class="img-thumbnail" style="width: 88px; height: auto;" alt="...">
+                                            <img src="..." class="img-thumbnail" style="width: 88px; height: auto;"
+                                                alt="...">
                                         </div>
                                         <div class="container-fluid mt-4" id="ads-location">
                                             <span><i class="bi bi-geo-alt"></i> </span>
@@ -56,7 +60,8 @@
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Close</button>
                                     </div>
                                 </div>
                             </div>
@@ -74,19 +79,19 @@
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-    $(document).ready(function(){
+    $(document).ready(function() {
 
         refreshResubmitedAdsList();
 
-        function refreshResubmitedAdsList(){
+        function refreshResubmitedAdsList() {
             $.ajax({
-                url: "{{url('admin/fetchResubmittedAdd')}}",
+                url: "{{ url('admin/fetchResubmittedAdd') }}",
                 type: "POST",
                 async: false,
-                success: function(add){
+                success: function(add) {
                     console.log(add);
                     $('#rejectedAdsList').html(``);
-                    if(add.length>0){
+                    if (add.length > 0) {
                         add.forEach(data => {
                             $('#rejectedAdsList').append(`
                                 <tr>
@@ -96,7 +101,7 @@
                                     <td>${data.timestamp}</td>
                                     <td style="text-transform: capitalize;">${data.add_status}</td>
                                     <td>
-                                        <button type="button" class="ads-view btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#staticBackdrop" data="${data.add_id}">
+                                        <button type="button" class="ads-view btn btn-primary btn-sm" data="${data.add_id}">
                                             <i class="bi bi-binoculars-fill"></i> View
                                         </button>
                                         <button class="approve btn btn-success btn-sm text-white" data="${data.add_id}" href=""><i class="bi bi-bag-check"></i> Approve</button>
@@ -111,76 +116,106 @@
         }
 
         // This will approve the add
-        $(document).on('click','.approve', function(e){
+        $(document).on('click', '.approve', function(e) {
             let aid = $(this).attr("data");
             $.ajax({
-                url: "{{url('admin/approveAdd')}}",
+                url: "{{ url('admin/approve-resubmitted-add') }}",
                 type: "POST",
-                data: {add_id : aid},
-                success: function(add){
+                data: {
+                    add_id: aid
+                },
+                success: function(add) {
                     $('#mytable').DataTable().destroy();
                     refreshResubmitedAdsList();
                     $('#mytable').DataTable().draw();
+                },
+                error: function(err) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Not Allowed',
+                        text: err.responseJSON.message
+                    })
                 }
             });
         });
 
         // This will reject the add
-        $(document).on('click','.reject', function(e){
+        $(document).on('click', '.reject', function(e) {
             Swal.fire({
-            title: 'Are you sure?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes! Reject'
+                title: 'Are you sure?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes! Reject'
             }).then((result) => {
                 if (result.isConfirmed) {
                     let aid = $(this).attr("data");
                     console.log(aid);
                     $.ajax({
-                        url: "{{url('admin/rejectAdd')}}",
+                        url: "{{ url('admin/reject-resubmitted-add') }}",
                         type: "POST",
-                        data: {add_id: aid},
+                        data: {
+                            add_id: aid
+                        },
                         success: function(add) {
                             $('#mytable').DataTable().destroy();
                             refreshResubmitedAdsList();
                             $('#mytable').DataTable().draw();
+                            Swal.fire(
+                                'Rejected!',
+                                'The add has been marked as rejected.',
+                                'success'
+                            )
                         },
+                        error: function(err) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Not Allowed',
+                                text: err.responseJSON.message
+                            })
+                        }
                     });
-                    Swal.fire(
-                    'Rejected!',
-                    'The add has been marked as rejected.',
-                    'success'
-                    )
                 }
             })
         });
 
-        $(document).on('click','.ads-view', function(e){
+        $(document).on('click', '.ads-view', function(e) {
             let aid = $(this).attr('data');
             $.ajax({
-                url: "{{url('admin/fetch-ads-view')}}",
+                url: "{{ url('admin/fetch-resubmitted-ads-view') }}",
                 type: 'POST',
-                data: {aid: aid},
-                success: function(res){
+                data: {
+                    aid: aid
+                },
+                success: function(res) {
                     console.log(res);
                     $('#ads-owner-name').html(res.username);
                     $('#ads-title').html(res.title);
                     $('#ads-images').html(``);
-                    $.each(res.image,function(key,result){
+                    $.each(res.image, function(key, result) {
                         $('#ads-images').append(`
-                        <img src="{{asset('${result.image_name}')}}" class="img-thumbnail" style="width: 88px; height: auto;" alt="...">
+                        <img src="{{ 'https://specbits.com/class2/fab/${result.image_name}' }}" class="img-thumbnail" style="width: 88px; height: auto;" alt="...">
                         `)
                     });
-                    $('#ads-location').html(`<span><i class="bi bi-geo-alt"></i> ${res.location.country}, ${res.location.state}, ${res.location.city}</span>`);
+                    $('#ads-location').html(
+                        `<span><i class="bi bi-geo-alt"></i> ${res.location.country}, ${res.location.state}, ${res.location.city}</span>`
+                    );
                     $('#ads-description').html(res.description);
                     $('#ads-main-info').html(``);
-                    $.each(res.data,function(key,result){
+                    $.each(res.data, function(key, result) {
                         $('#ads-main-info').append(`
                             <div class="col-6"><strong>${result.label}: </strong>${result.value}</div>
                         `);
                     });
+                    $('#staticBackdrop').modal('show');
+                },
+                error: function(err) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Not Allowed',
+                        text: err.responseJSON.message
+                    })
                 }
             });
         });
